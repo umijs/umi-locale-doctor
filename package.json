@@ -1,0 +1,54 @@
+{
+  "name": "umi-locale-doctor",
+  "version": "1.0.0",
+  "description": "A doctor checks which keys are miss defined in locales, and which keys are never used in source code",
+  "main": "./bin/index.js",
+  "bin": {
+    "umidoctor": "./bin/index.js"
+  },
+  "scripts": {
+    "test": "jest",
+    "build": "rm -rf bin && rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leftstick/umi-locale-doctor.git"
+  },
+  "keywords": [
+    "doctor",
+    "locales"
+  ],
+  "files": [
+    "bin",
+    "package.json"
+  ],
+  "author": "Howard.Zuo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leftstick/umi-locale-doctor/issues"
+  },
+  "homepage": "https://github.com/leftstick/umi-locale-doctor#readme",
+  "dependencies": {
+    "@babel/parser": "^7.6.2",
+    "@babel/traverse": "^7.6.2",
+    "@babel/types": "^7.6.1",
+    "chalk": "^2.4.2",
+    "commander": "^3.0.2",
+    "glob": "^7.1.4",
+    "mz": "^2.7.0"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "^7.0.7",
+    "@types/glob": "^7.1.1",
+    "@types/mz": "0.0.32",
+    "@types/node": "^12.7.8",
+    "rollup": "^1.22.0",
+    "rollup-plugin-auto-external": "^2.0.0",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-preserve-shebang": "^0.1.6",
+    "rollup-plugin-typescript2": "^0.24.3",
+    "tslint": "^5.20.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "typescript": "^3.6.3"
+  }
+}
