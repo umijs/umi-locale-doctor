@@ -1,6 +1,7 @@
 import babelParser from '@babel/parser'
 import { fs } from 'mz'
 import path from 'path'
+import EventEmitter from 'events'
 
 import {
   ExportDefaultDeclaration,
@@ -19,36 +20,37 @@ import {
 
 import { getLocaleFiles, getLang } from '@/src/helpers/fileUtil'
 import { flatten } from '@/src/helpers/object'
-import { ILocaleDetail } from '@/src/types'
+import { ILocaleKey, ILocale } from '@/src/types'
+import { LOCALE_PARSE_EVENTS } from '@/src/types/events'
 
-export async function parseLocales() {
-  const localesMap = await getLocaleFiles()
-  const localeFiles = flatten<string>(localesMap)
+export async function parseLocales(emitter: EventEmitter): Promise<ILocale[]> {
+  const localeFilepaths = await getLocaleFiles()
 
-  const localeDetails = await Promise.all(localeFiles.map(l => parseFileToLocale(l)))
+  emitter.emit(LOCALE_PARSE_EVENTS.START, localeFilepaths)
 
-  return localeDetails.map(d => ({
+  const localeFiles = flatten<string>(localeFilepaths)
+
+  const localeKeys = await Promise.all(
+    localeFiles.map(async l => {
+      const data = await parseFileToLocale(l)
+
+      emitter.emit(LOCALE_PARSE_EVENTS.PARSED, l)
+
+      return data
+    })
+  )
+
+  return localeKeys.map<ILocale>(d => ({
     lang: getLang(d[0].filePath),
-    details: d
+    localeKeys: d
   }))
 }
 
-async function parseFileToLocale(filePath: string): Promise<ILocaleDetail[]> {
+async function parseFileToLocale(filePath: string): Promise<ILocaleKey[]> {
   const code = await fs.readFile(filePath, { encoding: 'utf-8' })
   const ast = babelParser.parse(code, {
     sourceType: 'module',
-    plugins: [
-      'typescript',
-      'classProperties',
-      'dynamicImport',
-      'jsx',
-      [
-        'decorators',
-        {
-          decoratorsBeforeExport: true
-        }
-      ]
-    ]
+    plugins: ['typescript', 'classProperties', 'dynamicImport', 'jsx', 'decorators-legacy']
   })
 
   const exportDefaultDeclaration = ast.program.body.find((n): n is ExportDefaultDeclaration =>
@@ -88,19 +90,19 @@ async function parseFileToLocale(filePath: string): Promise<ILocaleDetail[]> {
 
         return Promise.resolve({
           key: propKey,
-          range: {
-            startLine: propLoc.start.line - 1,
+          loc: {
+            startLine: propLoc.start.line,
             startLineColumn: propLoc.start.column,
-            endLine: propLoc.end.line - 1,
+            endLine: propLoc.end.line,
             endLineColumn: propLoc.end.column
           },
           filePath
         })
       })
-      .filter((p): p is Promise<ILocaleDetail> => !!p)
+      .filter((p): p is Promise<ILocaleKey> => !!p)
   )
 
-  return flatten<ILocaleDetail>(result)
+  return flatten<ILocaleKey>(result)
 }
 
 async function getSpreadProperties(filePath: string, prop: SpreadElement, astbody: Statement[]) {
