@@ -1,4 +1,4 @@
-import babelParser from '@babel/parser'
+import * as babelParser from '@babel/parser'
 import { fs } from 'mz'
 import path from 'path'
 import { Token, Service, Inject } from 'typedi'
