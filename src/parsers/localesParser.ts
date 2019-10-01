@@ -24,6 +24,7 @@ import { flatten } from '@/src/helpers/object'
 import { langFromPath } from '@/src/helpers/text'
 import { ILocaleKey, ILocale } from '@/src/types'
 import { LOCALE_PARSE_EVENTS } from '@/src/types/events'
+import { BABEL_PARSER_OPTIONS } from '@/src/helpers/value'
 
 export interface ILocaleParser extends EventEmitter {
   parse(): Promise<ILocale[]>
@@ -64,10 +65,7 @@ export class LocalParser extends EventEmitter implements ILocaleParser {
 
 async function parseFileToLocale(filePath: string): Promise<ILocaleKey[]> {
   const code = await fs.readFile(filePath, { encoding: 'utf-8' })
-  const ast = babelParser.parse(code, {
-    sourceType: 'module',
-    plugins: ['typescript', 'classProperties', 'dynamicImport', 'jsx', 'decorators-legacy']
-  })
+  const ast = babelParser.parse(code, BABEL_PARSER_OPTIONS)
 
   const exportDefaultDeclaration = ast.program.body.find((n): n is ExportDefaultDeclaration =>
     isExportDefaultDeclaration(n)
@@ -118,7 +116,7 @@ async function parseFileToLocale(filePath: string): Promise<ILocaleKey[]> {
       .filter((p): p is Promise<ILocaleKey> => !!p)
   )
 
-  return flatten<ILocaleKey>(result)
+  return flatten<ILocaleKey>(result).filter((l): l is ILocaleKey => !!l)
 }
 
 async function getSpreadProperties(filePath: string, prop: SpreadElement, astbody: Statement[]) {

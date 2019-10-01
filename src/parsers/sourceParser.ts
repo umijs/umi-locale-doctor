@@ -18,6 +18,8 @@ import {
 import { IResourceMatcherToken, IResourceMatcher } from '@/src/services/resourceMatcher'
 import { ISource } from '@/src/types'
 import { SOURCE_PARSE_EVENTS } from '@/src/types/events'
+import { toILoc } from '@/src/helpers/object'
+import { BABEL_PARSER_OPTIONS } from '@/src/helpers/value'
 
 export interface ISourceParser extends EventEmitter {
   parse(): Promise<ISource[]>
@@ -50,10 +52,7 @@ export class SourceParser extends EventEmitter implements ISourceParser {
     const filePath = filePaths[0]
     const code = await fs.readFile(filePath, { encoding: 'utf-8' })
 
-    const ast = babelParser.parse(code, {
-      sourceType: 'module',
-      plugins: ['typescript', 'classProperties', 'dynamicImport', 'jsx', 'decorators-legacy']
-    })
+    const ast = babelParser.parse(code, BABEL_PARSER_OPTIONS)
 
     const source: ISource = {
       filePath,
@@ -72,12 +71,7 @@ export class SourceParser extends EventEmitter implements ISourceParser {
           if (attr && isStringLiteral(attr.value)) {
             source.keys.push({
               key: attr.value.value,
-              loc: {
-                startLine: attr.value.loc.start.line,
-                startLineColumn: attr.value.loc.start.column,
-                endLine: attr.value.loc.end.line,
-                endLineColumn: attr.value.loc.end.column
-              }
+              loc: toILoc(attr.value.loc)
             })
             return
           }
@@ -98,12 +92,7 @@ export class SourceParser extends EventEmitter implements ISourceParser {
               if (isStringLiteral(property.value)) {
                 source.keys.push({
                   key: property.value.value,
-                  loc: {
-                    startLine: property.value.loc.start.line,
-                    startLineColumn: property.value.loc.start.column,
-                    endLine: property.value.loc.end.line,
-                    endLineColumn: property.value.loc.end.column
-                  }
+                  loc: toILoc(property.value.loc)
                 })
                 return
               }
