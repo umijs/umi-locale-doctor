@@ -1,6 +1,7 @@
 # npm, yarn
 node_modules/
 yarn-error.log
+yarn.lock
 
 # osx
 .DS_Store
