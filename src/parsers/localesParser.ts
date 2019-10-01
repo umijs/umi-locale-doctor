@@ -37,7 +37,6 @@ export class LocalParser extends EventEmitter implements ILocaleParser {
   private resourceMatcher: IResourceMatcher
 
   public async parse(): Promise<ILocale[]> {
-    console.log('this.resourceMatcher', this.resourceMatcher)
     const localeFilepaths = await this.resourceMatcher.getLocaleFiles()
 
     this.emit(LOCALE_PARSE_EVENTS.START, localeFilepaths)
