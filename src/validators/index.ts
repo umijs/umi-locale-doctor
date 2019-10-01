@@ -2,20 +2,22 @@ import EventEmitter from 'events'
 import ora from 'ora'
 import chalk from 'chalk'
 import { table } from 'table'
+import { Container } from 'typedi'
 
 import { flatten } from '@/src/helpers/object'
-import { parseLocales } from '@/src/parsers/localesParser'
-import { parseSources } from '@/src/parsers/sourceParser'
+import { ILocaleParserToken } from '@/src/parsers/localesParser'
+import { ISourceParserToken } from '@/src/parsers/sourceParser'
 import { ILocale, IUnUsedWarning, IUndefinedWarning, ISource, IKey } from '@/src/types'
 import { LOCALE_PARSE_EVENTS, SOURCE_PARSE_EVENTS } from '@/src/types/events'
 import { toPercent } from '@/src/helpers/cal'
 
 export async function validate() {
-  const emitter = new EventEmitter()
+  const localeParser = Container.get(ILocaleParserToken)
+  const sourceParser = Container.get(ISourceParserToken)
 
-  progress(emitter)
+  progress(localeParser, sourceParser)
 
-  const [locales, sources] = await Promise.all([parseLocales(emitter), parseSources(emitter)])
+  const [locales, sources] = await Promise.all([localeParser.parse(), sourceParser.parse()])
 
   const usedKeys = new Set(flatten<IKey>(sources.map(s => s.keys)).map(kr => kr.key))
 
@@ -26,19 +28,19 @@ export async function validate() {
   printUndefinedKeys(undefinedKeys)
 }
 
-function progress(emitter: EventEmitter) {
+function progress(localeEmitter: EventEmitter, sourceEmitter: EventEmitter) {
   let localeSpinner: ora.Ora = null
   let sourceSpinner: ora.Ora = null
   let localeSpinnerTotal: number = null
   let localeSpinnerCounted: number = 0
   let sourceSpinnerTotal: number = null
   let sourceSpinnerCounted: number = 0
-  emitter.on(LOCALE_PARSE_EVENTS.START, (localeFilepaths: string[]) => {
+  localeEmitter.on(LOCALE_PARSE_EVENTS.START, (localeFilepaths: string[]) => {
     localeSpinner = ora('Parsing locales 0%').start()
     localeSpinnerTotal = localeFilepaths.length
   })
 
-  emitter.on(LOCALE_PARSE_EVENTS.PARSED, (localeFilepath: string) => {
+  localeEmitter.on(LOCALE_PARSE_EVENTS.PARSED, (localeFilepath: string) => {
     localeSpinnerCounted++
     localeSpinner.text = `Parsing locales ${toPercent(
       localeSpinnerTotal,
@@ -50,12 +52,12 @@ function progress(emitter: EventEmitter) {
     }
   })
 
-  emitter.on(SOURCE_PARSE_EVENTS.START, (sourceFilepaths: string[]) => {
+  sourceEmitter.on(SOURCE_PARSE_EVENTS.START, (sourceFilepaths: string[]) => {
     sourceSpinner = ora('Parsing locales 0%').start()
     sourceSpinnerTotal = sourceFilepaths.length
   })
 
-  emitter.on(SOURCE_PARSE_EVENTS.PARSED, (sourceFilepath: string) => {
+  sourceEmitter.on(SOURCE_PARSE_EVENTS.PARSED, (sourceFilepath: string) => {
     sourceSpinnerCounted++
     sourceSpinner.text = `Parsing sources ${toPercent(
       sourceSpinnerTotal,

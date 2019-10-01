@@ -1,6 +1,7 @@
 import babelParser from '@babel/parser'
 import { fs } from 'mz'
 import path from 'path'
+import { Token, Service, Inject } from 'typedi'
 import EventEmitter from 'events'
 
 import {
@@ -18,32 +19,48 @@ import {
   isImportDefaultSpecifier
 } from '@babel/types'
 
-import { getLocaleFiles, getLang } from '@/src/helpers/fileUtil'
+import { IResourceMatcherToken, IResourceMatcher } from '@/src/services/resourceMatcher'
 import { flatten } from '@/src/helpers/object'
+import { langFromPath } from '@/src/helpers/text'
 import { ILocaleKey, ILocale } from '@/src/types'
 import { LOCALE_PARSE_EVENTS } from '@/src/types/events'
 
-export async function parseLocales(emitter: EventEmitter): Promise<ILocale[]> {
-  const localeFilepaths = await getLocaleFiles()
+export interface ILocaleParser extends EventEmitter {
+  parse(): Promise<ILocale[]>
+}
 
-  emitter.emit(LOCALE_PARSE_EVENTS.START, localeFilepaths)
+export const ILocaleParserToken = new Token<ILocaleParser>()
 
-  const localeFiles = flatten<string>(localeFilepaths)
+@Service(ILocaleParserToken)
+export class LocalParser extends EventEmitter implements ILocaleParser {
+  @Inject(IResourceMatcherToken)
+  private resourceMatcher: IResourceMatcher
 
-  const localeKeys = await Promise.all(
-    localeFiles.map(async l => {
-      const data = await parseFileToLocale(l)
+  public async parse(): Promise<ILocale[]> {
+    console.log('this.resourceMatcher', this.resourceMatcher)
+    const localeFilepaths = await this.resourceMatcher.getLocaleFiles()
 
-      emitter.emit(LOCALE_PARSE_EVENTS.PARSED, l)
+    this.emit(LOCALE_PARSE_EVENTS.START, localeFilepaths)
 
-      return data
-    })
-  )
+    const localeFiles = flatten<string>(localeFilepaths)
 
-  return localeKeys.map<ILocale>(d => ({
-    lang: getLang(d[0].filePath),
-    localeKeys: d
-  }))
+    const localeKeys = await Promise.all(
+      localeFiles.map(async l => {
+        const data = await parseFileToLocale(l)
+
+        this.emit(LOCALE_PARSE_EVENTS.PARSED, l)
+
+        return data
+      })
+    )
+
+    return localeKeys
+      .filter((l): l is ILocaleKey[] => !!l)
+      .map<ILocale>(d => ({
+        lang: langFromPath(d[0].filePath),
+        localeKeys: d
+      }))
+  }
 }
 
 async function parseFileToLocale(filePath: string): Promise<ILocaleKey[]> {
