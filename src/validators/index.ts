@@ -1,46 +1,70 @@
 import EventEmitter from 'events'
-import ProgressBar from 'progress'
+import ora from 'ora'
+import chalk from 'chalk'
+import { table } from 'table'
 
 import { flatten } from '@/src/helpers/object'
 import { parseLocales } from '@/src/parsers/localesParser'
 import { parseSources } from '@/src/parsers/sourceParser'
 import { ILocale, IUnUsedWarning, IUndefinedWarning, ISource, IKey } from '@/src/types'
 import { LOCALE_PARSE_EVENTS, SOURCE_PARSE_EVENTS } from '@/src/types/events'
+import { toPercent } from '@/src/helpers/cal'
 
-export function validate() {
+export async function validate() {
   const emitter = new EventEmitter()
 
   progress(emitter)
 
-  Promise.all([parseLocales(emitter), parseSources(emitter)]).then(([locales, sources]) => {
-    const usedKeys = new Set(flatten<IKey>(sources.map(s => s.keys)).map(kr => kr.key))
-    const neverUsedKeys = findNeverUsedKeys(locales, usedKeys)
+  const [locales, sources] = await Promise.all([parseLocales(emitter), parseSources(emitter)])
 
-    const undefinedKeys = findUndefinedKeys(locales, sources)
-  })
+  const usedKeys = new Set(flatten<IKey>(sources.map(s => s.keys)).map(kr => kr.key))
+
+  const neverUsedKeys = findNeverUsedKeys(locales, usedKeys)
+  const undefinedKeys = findUndefinedKeys(locales, sources)
+
+  printNeverUsedKeys(neverUsedKeys)
+  printUndefinedKeys(undefinedKeys)
 }
 
 function progress(emitter: EventEmitter) {
-  let localeBar: ProgressBar = null
-  let sourceBar: ProgressBar = null
+  let localeSpinner: ora.Ora = null
+  let sourceSpinner: ora.Ora = null
+  let localeSpinnerTotal: number = null
+  let localeSpinnerCounted: number = 0
+  let sourceSpinnerTotal: number = null
+  let sourceSpinnerCounted: number = 0
   emitter.on(LOCALE_PARSE_EVENTS.START, (localeFilepaths: string[]) => {
-    localeBar = new ProgressBar('Parsing locales :file [:bar] :rate/bps :percent :etas', {
-      total: localeFilepaths.length
-    })
+    localeSpinner = ora('Parsing locales 0%').start()
+    localeSpinnerTotal = localeFilepaths.length
   })
 
   emitter.on(LOCALE_PARSE_EVENTS.PARSED, (localeFilepath: string) => {
-    localeBar.tick()
+    localeSpinnerCounted++
+    localeSpinner.text = `Parsing locales ${toPercent(
+      localeSpinnerTotal,
+      localeSpinnerCounted
+    )}% => ${localeFilepath.replace(process.cwd(), '').slice(1)}`
+
+    if (localeSpinnerCounted === localeSpinnerTotal) {
+      localeSpinner.succeed()
+    }
   })
 
   emitter.on(SOURCE_PARSE_EVENTS.START, (sourceFilepaths: string[]) => {
-    sourceBar = new ProgressBar('Parsing source :file [:bar] :rate/bps :percent :etas', {
-      total: sourceFilepaths.length
-    })
+    sourceSpinner = ora('Parsing locales 0%').start()
+    sourceSpinnerTotal = sourceFilepaths.length
   })
 
   emitter.on(SOURCE_PARSE_EVENTS.PARSED, (sourceFilepath: string) => {
-    sourceBar.tick()
+    sourceSpinnerCounted++
+    sourceSpinner.text = `Parsing sources ${toPercent(
+      sourceSpinnerTotal,
+      sourceSpinnerCounted
+    )}% => ${sourceFilepath.replace(process.cwd(), '').slice(1)}`
+
+    if (sourceSpinnerCounted === sourceSpinnerTotal) {
+      sourceSpinner.succeed()
+    }
   })
 }
 
@@ -69,4 +93,53 @@ function findUndefinedKeys(locales: ILocale[], sources: ISource[]) {
       }))
   })
   return flatten<IUndefinedWarning>(rawWarnings)
+}
+
+function printNeverUsedKeys(neverUsedKeys: IUnUsedWarning[]) {
+  const data = []
+
+  console.log('')
+  console.log('  ' + chalk.yellow.bold.bold('Keys defined but never used'))
+
+  data.push([chalk.bold('Key'), chalk.bold('Location')])
+
+  let rawData = neverUsedKeys
+  if (neverUsedKeys.length > 10) {
+    rawData = neverUsedKeys.slice(0, 10)
+  }
+  rawData.forEach(unusedKey => {
+    data.push([
+      unusedKey.key,
+      `${unusedKey.filePath.replace(process.cwd(), '').slice(1)}:${unusedKey.loc.startLine}`
+    ])
+  })
+  if (neverUsedKeys.length > 10) {
+    data.push(['...', 'too many unused keys'])
+  }
+  console.log(table(data))
+}
+
+function printUndefinedKeys(undefinedKeys: IUndefinedWarning[]) {
+  const data = []
+
+  console.log('')
+  console.log('  ' + chalk.yellow.bold.bold('Keys used but never defined'))
+
+  data.push([chalk.bold('Key'), chalk.bold('Langs'), chalk.bold('Location')])
+
+  let rawData = undefinedKeys
+  if (undefinedKeys.length > 10) {
+    rawData = undefinedKeys.slice(0, 10)
+  }
+  rawData.forEach(undefinedKey => {
+    data.push([
+      undefinedKey.key,
+      undefinedKey.langs.join(', '),
+      `${undefinedKey.sourcePath.replace(process.cwd(), '').slice(1)}:${undefinedKey.loc.startLine}`
+    ])
+  })
+  if (undefinedKeys.length > 10) {
+    data.push(['...', '...', 'too many undefined keys'])
+  }
+  console.log(table(data))
 }
