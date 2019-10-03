@@ -10,12 +10,8 @@ describe('file match', () => {
   })
 })
 
-describe('directory match', () => {
-  it('normal case', () => {
-    expect(langFromPath('/a/b/zh-CN')).toEqual('zh-CN')
-  })
-
-  it('bad case', () => {
-    expect(langFromPath('/a/b/zh')).toEqual('')
+describe('directory not match', () => {
+  it('should not match case', () => {
+    expect(langFromPath('/a/b/zh-CN')).toEqual('')
   })
 })

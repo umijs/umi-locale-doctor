@@ -4,5 +4,6 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1'
   },
-  collectCoverageFrom: ['src/**/*.{js,ts}']
+  collectCoverageFrom: ['src/**/*.{js,ts}'],
+  setupFiles: ['./test/helpers.ts']
 }
