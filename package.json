@@ -6,6 +6,16 @@
   "bin": {
     "udoctor": "./bin/index.js"
   },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
   "scripts": {
     "test": "jest --coverage",
     "coverage": "cat ./coverage/lcov.info | coveralls",
@@ -42,6 +52,8 @@
     "typedi": "^0.8.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
     "@types/babel__traverse": "^7.0.7",
     "@types/glob": "^7.1.1",
     "@types/jest": "^24.0.18",
@@ -49,6 +61,7 @@
     "@types/node": "^12.7.8",
     "@types/table": "^4.0.7",
     "coveralls": "^3.0.6",
+    "husky": "^3.0.8",
     "jest": "^24.9.0",
     "rollup": "^1.22.0",
     "rollup-plugin-auto-external": "^2.0.0",
