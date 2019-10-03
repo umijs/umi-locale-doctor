@@ -30,6 +30,10 @@ Execute `udoctor` at the root dir of your `umi` based repo.
 udoctor
 ```
 
+## Want to contribute?
+
+see [contributing](https://github.com/leftstick/umi-locale-doctor/blob/master/CONTRIBUTING.md)
+
 ## LICENSE
 
 [MIT License](https://raw.githubusercontent.com/leftstick/umi-locale-doctor/master/LICENSE)
