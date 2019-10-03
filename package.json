@@ -7,8 +7,8 @@
     "udoctor": "./bin/index.js"
   },
   "scripts": {
-    "test": "jest",
-    "coverage": "jest --coverage --coverageReporters=text-lcov | coveralls",
+    "test": "jest --coverage",
+    "coverage": "cat ./coverage/lcov.info | coveralls",
     "build": "rollup -c --watch"
   },
   "repository": {
