@@ -48,7 +48,7 @@ class ResourceMatcher implements IResourceMatcher {
         if (err) {
           return reject(err)
         }
-        return resolve(files.map(f => path.resolve(process.cwd(), f)) || [])
+        return resolve(files.map(f => path.resolve(process.cwd(), f)))
       })
     })
   }
