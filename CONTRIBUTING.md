@@ -16,9 +16,7 @@ yarn link
 
 > now, `udoctor` is available at your working system.
 
-## Common Tasks
-
-**debug compilation**
+## watch build
 
 Monitor file changes and transform with `rollup`.
 
@@ -26,7 +24,7 @@ Monitor file changes and transform with `rollup`.
 yarn build --watch
 ```
 
-**execute tests**
+## tests
 
 ```bash
 # run all tests
@@ -38,3 +36,9 @@ yarn test cal.test.ts
 # with code coverage
 yarn test --coverage
 ```
+
+### debug test
+
+- open repo via `vscode`
+- open test case, for example: `test/helpers/cal.test.ts`
+- hit `F5` to start debug this specific test
