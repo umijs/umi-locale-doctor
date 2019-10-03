@@ -17,7 +17,7 @@ import {
 
 import { IResourceMatcherToken, IResourceMatcher } from '@/src/services/resourceMatcher'
 import { ISource } from '@/src/types'
-import { SOURCE_PARSE_EVENTS } from '@/src/types/events'
+import { PARSE_EVENTS } from '@/src/types/events'
 import { toILoc } from '@/src/helpers/object'
 import { BABEL_PARSER_OPTIONS } from '@/src/helpers/value'
 
@@ -39,7 +39,7 @@ export class SourceParser extends EventEmitter implements ISourceParser {
   public async parse(): Promise<ISource[]> {
     const sourceFiles = await this.resourceMatcher.getSourceFiles()
 
-    this.emit(SOURCE_PARSE_EVENTS.START, sourceFiles)
+    this.emit(PARSE_EVENTS.START, sourceFiles)
 
     const sources: ISource[] = await this.parseRest(sourceFiles)
     return sources.filter(s => s.keys.length)
@@ -102,7 +102,7 @@ export class SourceParser extends EventEmitter implements ISourceParser {
       }
     })
 
-    this.emit(SOURCE_PARSE_EVENTS.PARSED, filePath)
+    this.emit(PARSE_EVENTS.PARSED, filePath)
 
     return [source].concat(await this.parseRest(filePaths.slice(1)))
   }

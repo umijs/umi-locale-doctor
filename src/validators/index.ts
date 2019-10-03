@@ -8,7 +8,7 @@ import { flatten } from '@/src/helpers/object'
 import { ILocaleParserToken } from '@/src/services/localesParser'
 import { ISourceParserToken } from '@/src/services/sourceParser'
 import { ILocale, IUnUsedWarning, IUndefinedWarning, ISource, IKey } from '@/src/types'
-import { LOCALE_PARSE_EVENTS, SOURCE_PARSE_EVENTS } from '@/src/types/events'
+import { PARSE_EVENTS } from '@/src/types/events'
 import { toPercent } from '@/src/helpers/cal'
 
 export async function validate() {
@@ -35,12 +35,12 @@ function progress(localeEmitter: EventEmitter, sourceEmitter: EventEmitter) {
   let localeSpinnerCounted: number = 0
   let sourceSpinnerTotal: number = null
   let sourceSpinnerCounted: number = 0
-  localeEmitter.on(LOCALE_PARSE_EVENTS.START, (localeFilepaths: string[]) => {
+  localeEmitter.on(PARSE_EVENTS.START, (localeFilepaths: string[]) => {
     localeSpinner = ora('Parsing locales 0%').start()
     localeSpinnerTotal = localeFilepaths.length
   })
 
-  localeEmitter.on(LOCALE_PARSE_EVENTS.PARSED, (localeFilepath: string) => {
+  localeEmitter.on(PARSE_EVENTS.PARSED, (localeFilepath: string) => {
     localeSpinnerCounted++
     localeSpinner.text = `Parsing locales ${toPercent(
       localeSpinnerTotal,
@@ -52,12 +52,12 @@ function progress(localeEmitter: EventEmitter, sourceEmitter: EventEmitter) {
     }
   })
 
-  sourceEmitter.on(SOURCE_PARSE_EVENTS.START, (sourceFilepaths: string[]) => {
+  sourceEmitter.on(PARSE_EVENTS.START, (sourceFilepaths: string[]) => {
     sourceSpinner = ora('Parsing locales 0%').start()
     sourceSpinnerTotal = sourceFilepaths.length
   })
 
-  sourceEmitter.on(SOURCE_PARSE_EVENTS.PARSED, (sourceFilepath: string) => {
+  sourceEmitter.on(PARSE_EVENTS.PARSED, (sourceFilepath: string) => {
     sourceSpinnerCounted++
     sourceSpinner.text = `Parsing sources ${toPercent(
       sourceSpinnerTotal,

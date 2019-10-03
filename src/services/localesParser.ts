@@ -23,7 +23,7 @@ import { IResourceMatcherToken, IResourceMatcher } from '@/src/services/resource
 import { flatten } from '@/src/helpers/object'
 import { langFromPath } from '@/src/helpers/text'
 import { ILocaleKey, ILocale } from '@/src/types'
-import { LOCALE_PARSE_EVENTS } from '@/src/types/events'
+import { PARSE_EVENTS } from '@/src/types/events'
 import { BABEL_PARSER_OPTIONS } from '@/src/helpers/value'
 
 export interface ILocaleParser extends EventEmitter {
@@ -40,7 +40,7 @@ export class LocalParser extends EventEmitter implements ILocaleParser {
   public async parse(): Promise<ILocale[]> {
     const localeFilepaths = await this.resourceMatcher.getLocaleFiles()
 
-    this.emit(LOCALE_PARSE_EVENTS.START, localeFilepaths)
+    this.emit(PARSE_EVENTS.START, localeFilepaths)
 
     const localeFiles = flatten<string>(localeFilepaths)
 
@@ -48,7 +48,7 @@ export class LocalParser extends EventEmitter implements ILocaleParser {
       localeFiles.map(async l => {
         const data = await parseFileToLocale(l)
 
-        this.emit(LOCALE_PARSE_EVENTS.PARSED, l)
+        this.emit(PARSE_EVENTS.PARSED, l)
 
         return data
       })
