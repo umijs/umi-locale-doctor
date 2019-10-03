@@ -1,4 +1,4 @@
-import * as babelParser from '@babel/parser'
+import babelParser from '@babel/parser'
 import { fs } from 'mz'
 import traverse from '@babel/traverse'
 import EventEmitter from 'events'
