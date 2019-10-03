@@ -20,7 +20,7 @@ describe('locale files', () => {
 
     const files = await matcher.getLocaleFiles()
 
-    expect(files.map(f => f.replace(runDir, ''))).toEqual(['/src/locales/en-US.js', '/src/locales/zh-CN.js'])
+    expect(global['removeCwd'](...files)).toEqual(['/src/locales/en-US.js', '/src/locales/zh-CN.js'])
   })
 
   it('with invalid locales', async () => {
@@ -31,7 +31,7 @@ describe('locale files', () => {
 
     const files = await matcher.getLocaleFiles()
 
-    expect(files.map(f => f.replace(runDir, ''))).toEqual(['/src/locales/zh-CN.js'])
+    expect(global['removeCwd'](...files)).toEqual(['/src/locales/zh-CN.js'])
   })
 
   it('with no locales', async () => {
@@ -52,6 +52,60 @@ describe('locale files', () => {
     const matcher = Container.get(IResourceMatcherToken)
 
     const files = await matcher.getLocaleFiles()
+
+    expect(files).toEqual([])
+  })
+})
+
+describe('source files', () => {
+  beforeAll(() => {
+    CWD = process.cwd()
+  })
+
+  afterEach(() => {
+    process.chdir(CWD)
+  })
+
+  it('only valid sources', async () => {
+    const runDir = global['toFixturesDir']('resourceMatcher', 'only_valid_sources')
+    process.chdir(runDir)
+
+    const matcher = Container.get(IResourceMatcherToken)
+
+    const files = await matcher.getSourceFiles()
+
+    expect(global['removeCwd'](...files)).toEqual(['/src/pages/home.js', '/src/pages/login.js'])
+  })
+
+  it('with invalid sources', async () => {
+    const runDir = global['toFixturesDir']('resourceMatcher', 'with_invalid_sources')
+    process.chdir(runDir)
+
+    const matcher = Container.get(IResourceMatcherToken)
+
+    const files = await matcher.getSourceFiles()
+
+    expect(global['removeCwd'](...files)).toEqual(['/src/pages/login.js'])
+  })
+
+  it('with no sources', async () => {
+    const runDir = global['toFixturesDir']('resourceMatcher', 'with_no_sources')
+    process.chdir(runDir)
+
+    const matcher = Container.get(IResourceMatcherToken)
+
+    const files = await matcher.getSourceFiles()
+
+    expect(files).toEqual([])
+  })
+
+  it('with no valid sources', async () => {
+    const runDir = global['toFixturesDir']('resourceMatcher', 'with_novalid_sources')
+    process.chdir(runDir)
+
+    const matcher = Container.get(IResourceMatcherToken)
+
+    const files = await matcher.getSourceFiles()
 
     expect(files).toEqual([])
   })

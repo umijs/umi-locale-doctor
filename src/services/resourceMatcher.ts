@@ -1,15 +1,18 @@
 import { Service, Token } from 'typedi'
 import * as glob from 'glob'
+import * as path from 'path'
 import { flatten } from '@/src/helpers/object'
 import { langFromPath } from '@/src/helpers/text'
 
 const SOURCE_IGNORE_PATTERNS = [
   'src/locales/**',
   'src/locale/**',
-  'src/**/*.d.ts',
-  'src/e2e/**',
-  'test/**',
-  'src/test/**'
+  '**/*.d.ts',
+  '**/test/**',
+  '**/e2e/**',
+  '**/*.test.{js,ts}',
+  '**/__mocks__/**',
+  '**/__tests__/**'
 ]
 
 export interface IResourceMatcher {
@@ -41,11 +44,11 @@ class ResourceMatcher implements IResourceMatcher {
 
   private getFiles(pattern: string, ignore?: string | string[]): Promise<string[]> {
     return new Promise((resolve, reject) => {
-      glob(pattern, { absolute: true, ignore }, (err, files) => {
+      glob(pattern, { ignore }, (err, files) => {
         if (err) {
           return reject(err)
         }
-        return resolve(files || [])
+        return resolve(files.map(f => path.resolve(process.cwd(), f)) || [])
       })
     })
   }

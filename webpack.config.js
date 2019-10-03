@@ -10,7 +10,6 @@ module.exports = {
   optimization: {
     minimize: false
   },
-  stats: 'errors-only',
   module: {
     rules: [
       {
