@@ -19,7 +19,7 @@ See below:
 ## Install
 
 ```bash
-npm i -g umi-locale-doctor
+yarn global add umi-locale-doctor
 ```
 
 ## Usage

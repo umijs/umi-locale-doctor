@@ -17,9 +17,9 @@
     ]
   },
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest",
     "coverage": "cat ./coverage/lcov.info | coveralls",
-    "build": "rollup -c --watch"
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
