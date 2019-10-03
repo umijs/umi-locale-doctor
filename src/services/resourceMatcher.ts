@@ -1,7 +1,5 @@
 import { Service, Token } from 'typedi'
 import * as glob from 'glob'
-import { fs } from 'mz'
-import path from 'path'
 import { flatten } from '@/src/helpers/object'
 import { langFromPath } from '@/src/helpers/text'
 

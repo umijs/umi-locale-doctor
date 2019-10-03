@@ -1,4 +1,3 @@
-import * as glob from 'glob'
 import { Container } from 'typedi'
 import { IResourceMatcherToken } from '@/src/services/resourceMatcher'
 
@@ -37,6 +36,17 @@ describe('locale files', () => {
 
   it('with no locales', async () => {
     const runDir = global['toFixturesDir']('resourceMatcher', 'with_no_locales')
+    process.chdir(runDir)
+
+    const matcher = Container.get(IResourceMatcherToken)
+
+    const files = await matcher.getLocaleFiles()
+
+    expect(files).toEqual([])
+  })
+
+  it('with no valid locales', async () => {
+    const runDir = global['toFixturesDir']('resourceMatcher', 'with_novalid_locales')
     process.chdir(runDir)
 
     const matcher = Container.get(IResourceMatcherToken)
