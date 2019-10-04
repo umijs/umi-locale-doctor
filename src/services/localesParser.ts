@@ -16,13 +16,14 @@ import {
   isIdentifier,
   Statement,
   isImportDeclaration,
-  isImportDefaultSpecifier
+  isImportDefaultSpecifier,
+  ObjectProperty
 } from '@babel/types'
 
 import { IResourceMatcherToken, IResourceMatcher } from '@/src/services/resourceMatcher'
-import { flatten } from '@/src/helpers/object'
+import { flatten, toILoc } from '@/src/helpers/object'
 import { langFromPath } from '@/src/helpers/text'
-import { ILocaleKey, ILocale } from '@/src/types'
+import { ILocaleKey, ILocale, IKey } from '@/src/types'
 import { PARSE_EVENTS } from '@/src/types/events'
 import { BABEL_PARSER_OPTIONS } from '@/src/helpers/value'
 
@@ -56,10 +57,12 @@ export class LocalParser extends EventEmitter implements ILocaleParser {
 
     return localeKeys
       .filter((l): l is ILocaleKey[] => !!l)
-      .map<ILocale>(d => ({
-        lang: langFromPath(d[0].filePath),
-        localeKeys: d
-      }))
+      .map<ILocale>(d => {
+        return {
+          lang: langFromPath(d[0].filePath),
+          localeKeys: d
+        }
+      })
   }
 }
 
@@ -85,47 +88,53 @@ async function parseFileToLocale(filePath: string): Promise<ILocaleKey[]> {
   const result = await Promise.all(
     localeAst.properties
       .map(p => {
-        let propLoc = p.loc
-        let propKey: string = ''
-
         if (isObjectProperty(p)) {
-          propKey = p.key.name
-          if (isStringLiteral(p.key)) {
-            propKey = p.key.value
-            propLoc = p.key.loc
-          }
+          return parseFromObjectProperty(p, filePath)
         }
         if (isSpreadElement(p)) {
-          return getSpreadProperties(filePath, p, ast.program.body)
+          return parseFromSpreadProperty(filePath, p, ast.program.body)
         }
-        if (!propLoc || !propKey) {
-          return null
-        }
-
-        return Promise.resolve({
-          key: propKey,
-          loc: {
-            startLine: propLoc.start.line,
-            startLineColumn: propLoc.start.column,
-            endLine: propLoc.end.line,
-            endLineColumn: propLoc.end.column
-          },
-          filePath
-        })
+        return null
       })
-      .filter((p): p is Promise<ILocaleKey> => !!p)
+      .filter((p): p is Promise<ILocaleKey[]> => !!p)
   )
 
   return flatten<ILocaleKey>(result).filter((l): l is ILocaleKey => !!l)
 }
 
-async function getSpreadProperties(filePath: string, prop: SpreadElement, astbody: Statement[]) {
+function parseFromObjectProperty(prop: ObjectProperty, filePath: string): Promise<ILocaleKey[]> | null {
+  if (isIdentifier(prop.key)) {
+    return Promise.resolve([
+      {
+        key: prop.key.name,
+        loc: toILoc(prop.key.loc),
+        filePath
+      }
+    ])
+  }
+  if (isStringLiteral(prop.key)) {
+    return Promise.resolve([
+      {
+        key: prop.key.value,
+        loc: toILoc(prop.key.loc),
+        filePath
+      }
+    ])
+  }
+  return null
+}
+
+function parseFromSpreadProperty(
+  filePath: string,
+  prop: SpreadElement,
+  astbody: Statement[]
+): Promise<ILocaleKey[]> | null {
   const { argument } = prop
   if (!isIdentifier(argument)) {
-    return []
+    return null
   }
   const { name } = argument
-  return await parseByIdentifier(filePath, name, astbody)
+  return parseByIdentifier(filePath, name, astbody)
 }
 
 async function parseByIdentifier(filePath: string, identifier: string, astbody: Statement[]) {
