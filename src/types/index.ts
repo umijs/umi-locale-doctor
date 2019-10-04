@@ -36,3 +36,14 @@ export interface IUndefinedWarning {
   sourcePath: string
   langs: string[]
 }
+
+interface ICompilerOptions {
+  baseUrl: string
+  paths: {
+    [key: string]: string[]
+  }
+}
+
+export interface ITsConfig {
+  compilerOptions: ICompilerOptions
+}
