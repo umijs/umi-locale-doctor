@@ -5,6 +5,7 @@
 [![Coverage Status][coverage-image]][coverage-url]
 ![][david-url]
 ![][dt-url]
+[![code style: prettier][prettier-image]][prettier-url]
 ![][license-url]
 
 A useful tool to analyze [umi-locale-usage](https://umijs.org/api/#locale):
@@ -47,3 +48,5 @@ see [contributing](https://github.com/leftstick/umi-locale-doctor/blob/master/CO
 [coverage-url]: https://coveralls.io/github/leftstick/umi-locale-doctor
 [dt-url]: https://img.shields.io/npm/dt/umi-locale-doctor.svg
 [license-url]: https://img.shields.io/github/license/leftstick/umi-locale-doctor
+[prettier-image]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg
+[prettier-url]: https://github.com/prettier/prettier
