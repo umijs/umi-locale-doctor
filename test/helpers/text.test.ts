@@ -9,9 +9,3 @@ describe('file match', () => {
     expect(langFromPath('/a/b/zh.js')).toEqual('')
   })
 })
-
-describe('directory not match', () => {
-  it('should not match case', () => {
-    expect(langFromPath('/a/b/zh-CN')).toEqual('')
-  })
-})

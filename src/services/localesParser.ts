@@ -1,4 +1,4 @@
-import babelParser from '@babel/parser'
+import { parse } from '@babel/parser'
 import { fs } from 'mz'
 import path from 'path'
 import { Token, Service, Inject } from 'typedi'
@@ -66,9 +66,9 @@ export class LocalParser extends EventEmitter implements ILocaleParser {
   }
 }
 
-async function parseFileToLocale(filePath: string): Promise<ILocaleKey[]> {
+async function parseFileToLocale(filePath: string): Promise<ILocaleKey[]> | null {
   const code = await fs.readFile(filePath, { encoding: 'utf-8' })
-  const ast = babelParser.parse(code, BABEL_PARSER_OPTIONS)
+  const ast = parse(code, BABEL_PARSER_OPTIONS)
 
   const exportDefaultDeclaration = ast.program.body.find((n): n is ExportDefaultDeclaration =>
     isExportDefaultDeclaration(n)
@@ -139,10 +139,7 @@ function parseFromSpreadProperty(
 
 async function parseByIdentifier(filePath: string, identifier: string, astbody: Statement[]) {
   const found = astbody.find(a => {
-    return (
-      isImportDeclaration(a) &&
-      a.specifiers.some(s => isImportDefaultSpecifier(s) && s.local.name === identifier)
-    )
+    return isImportDeclaration(a) && a.specifiers.some(s => isImportDefaultSpecifier(s) && s.local.name === identifier)
   })
 
   if (!found || !isImportDeclaration(found) || !isStringLiteral(found.source)) {

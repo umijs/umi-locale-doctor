@@ -6,5 +6,8 @@
     "export-name": false,
     "non-literal-fs-path": false,
     "function-name": false
+  },
+  "linterOptions": {
+    "exclude": ["test/fixtures/**"]
   }
 }
