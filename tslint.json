@@ -5,7 +5,8 @@
   "rules": {
     "export-name": false,
     "non-literal-fs-path": false,
-    "function-name": false
+    "function-name": false,
+    "import-name": false
   },
   "linterOptions": {
     "exclude": ["test/fixtures/**"]

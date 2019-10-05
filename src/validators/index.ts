@@ -1,5 +1,3 @@
-import EventEmitter from 'events'
-import ora from 'ora'
 import chalk from 'chalk'
 import { table } from 'table'
 import { Container } from 'typedi'
@@ -8,14 +6,14 @@ import { flatten } from '@/src/helpers/object'
 import { ILocaleParserToken } from '@/src/services/localesParser'
 import { ISourceParserToken } from '@/src/services/sourceParser'
 import { ILocale, IUnUsedWarning, IUndefinedWarning, ISource, IKey } from '@/src/types'
-import { PARSE_EVENTS } from '@/src/types/events'
-import { toPercent } from '@/src/helpers/cal'
+import ProgressPrinter from '@/src/validators/progressPrinter'
 
 export async function validate() {
   const localeParser = Container.get(ILocaleParserToken)
   const sourceParser = Container.get(ISourceParserToken)
 
-  progress(localeParser, sourceParser)
+  new ProgressPrinter(localeParser, 'locales').start()
+  new ProgressPrinter(sourceParser, 'sources').start()
 
   const [locales, sources] = await Promise.all([localeParser.parse(), sourceParser.parse()])
 
@@ -26,48 +24,6 @@ export async function validate() {
 
   printNeverUsedKeys(neverUsedKeys)
   printUndefinedKeys(undefinedKeys)
-}
-
-function progress(localeEmitter: EventEmitter, sourceEmitter: EventEmitter) {
-  let localeSpinner: ora.Ora = null
-  let sourceSpinner: ora.Ora = null
-  let localeSpinnerTotal: number = null
-  let localeSpinnerCounted: number = 0
-  let sourceSpinnerTotal: number = null
-  let sourceSpinnerCounted: number = 0
-  localeEmitter.on(PARSE_EVENTS.START, (localeFilepaths: string[]) => {
-    localeSpinner = ora('Parsing locales 0%').start()
-    localeSpinnerTotal = localeFilepaths.length
-  })
-
-  localeEmitter.on(PARSE_EVENTS.PARSED, (localeFilepath: string) => {
-    localeSpinnerCounted++
-    localeSpinner.text = `Parsing locales ${toPercent(
-      localeSpinnerTotal,
-      localeSpinnerCounted
-    )}% => ${localeFilepath.replace(process.cwd(), '').slice(1)}`
-
-    if (localeSpinnerCounted === localeSpinnerTotal) {
-      localeSpinner.succeed()
-    }
-  })
-
-  sourceEmitter.on(PARSE_EVENTS.START, (sourceFilepaths: string[]) => {
-    sourceSpinner = ora('Parsing locales 0%').start()
-    sourceSpinnerTotal = sourceFilepaths.length
-  })
-
-  sourceEmitter.on(PARSE_EVENTS.PARSED, (sourceFilepath: string) => {
-    sourceSpinnerCounted++
-    sourceSpinner.text = `Parsing sources ${toPercent(
-      sourceSpinnerTotal,
-      sourceSpinnerCounted
-    )}% => ${sourceFilepath.replace(process.cwd(), '').slice(1)}`
-
-    if (sourceSpinnerCounted === sourceSpinnerTotal) {
-      sourceSpinner.succeed()
-    }
-  })
 }
 
 function findNeverUsedKeys(locales: ILocale[], usedKeys: Set<string>) {
@@ -110,10 +66,7 @@ function printNeverUsedKeys(neverUsedKeys: IUnUsedWarning[]) {
     rawData = neverUsedKeys.slice(0, 10)
   }
   rawData.forEach(unusedKey => {
-    data.push([
-      unusedKey.key,
-      `${unusedKey.filePath.replace(process.cwd(), '').slice(1)}:${unusedKey.loc.startLine}`
-    ])
+    data.push([unusedKey.key, `${unusedKey.filePath.replace(process.cwd(), '').slice(1)}:${unusedKey.loc.startLine}`])
   })
   if (neverUsedKeys.length > 10) {
     data.push(['...', 'too many unused keys'])
