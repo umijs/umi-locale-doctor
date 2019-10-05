@@ -1,4 +1,4 @@
-import babelParser from '@babel/parser'
+import { parse } from '@babel/parser'
 import { fs } from 'mz'
 import traverse from '@babel/traverse'
 import EventEmitter from 'events'
@@ -29,12 +29,8 @@ export const ISourceParserToken = new Token<ISourceParser>()
 
 @Service(ISourceParserToken)
 export class SourceParser extends EventEmitter implements ISourceParser {
+  @Inject(IResourceMatcherToken)
   private resourceMatcher: IResourceMatcher
-
-  constructor(@Inject(IResourceMatcherToken) resourceMatcher: IResourceMatcher) {
-    super()
-    this.resourceMatcher = resourceMatcher
-  }
 
   public async parse(): Promise<ISource[]> {
     const sourceFiles = await this.resourceMatcher.getSourceFiles()
@@ -52,7 +48,7 @@ export class SourceParser extends EventEmitter implements ISourceParser {
     const filePath = filePaths[0]
     const code = await fs.readFile(filePath, { encoding: 'utf-8' })
 
-    const ast = babelParser.parse(code, BABEL_PARSER_OPTIONS)
+    const ast = parse(code, BABEL_PARSER_OPTIONS)
 
     const source: ISource = {
       filePath,
@@ -73,7 +69,6 @@ export class SourceParser extends EventEmitter implements ISourceParser {
               key: attr.value.value,
               loc: toILoc(attr.value.loc)
             })
-            return
           }
         }
       },
@@ -94,7 +89,6 @@ export class SourceParser extends EventEmitter implements ISourceParser {
                   key: property.value.value,
                   loc: toILoc(property.value.loc)
                 })
-                return
               }
             }
           }
