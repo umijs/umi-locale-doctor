@@ -159,4 +159,59 @@ describe('locale files', () => {
       }
     ])
   })
+
+  it('invalid locales with no default export', async () => {
+    const runDir = global.toFixturesDir('localesParser', 'invalid_locales_no_default_export')
+    process.chdir(runDir)
+
+    const parser = Container.get(ILocaleParserToken)
+
+    const locales = await parser.parse()
+
+    expect(locales).toEqual([])
+  })
+
+  it('invalid locales with no local reference defined', async () => {
+    const runDir = global.toFixturesDir('localesParser', 'invalid_locales_no_local_ref_defined')
+    process.chdir(runDir)
+
+    const parser = Container.get(ILocaleParserToken)
+
+    const locales = await parser.parse()
+
+    expect(locales).toEqual([
+      {
+        lang: 'zh-CN',
+        localeKeys: [
+          {
+            key: 'name',
+            loc: {
+              startLine: 4,
+              startLineColumn: 2,
+              endLine: 4,
+              endLineColumn: 6
+            },
+            filePath: global.toFixturesDir(
+              'localesParser',
+              'invalid_locales_no_local_ref_defined',
+              'src',
+              'locales',
+              'zh-CN.ts'
+            )
+          }
+        ]
+      }
+    ])
+  })
+
+  it('invalid locales with invalid object property', async () => {
+    const runDir = global.toFixturesDir('localesParser', 'invalid_locales')
+    process.chdir(runDir)
+
+    const parser = Container.get(ILocaleParserToken)
+
+    const locales = await parser.parse()
+
+    expect(locales).toEqual([])
+  })
 })

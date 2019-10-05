@@ -62,7 +62,7 @@ export class LocalParser extends EventEmitter implements ILocaleParser {
       })
     )
 
-    return locales.filter((l): l is ILocale => !!l.localeKeys)
+    return locales.filter((l): l is ILocale => !!l.localeKeys && !!l.localeKeys.length)
   }
 }
 
