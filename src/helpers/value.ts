@@ -12,7 +12,7 @@ export const BABEL_PARSER_OPTIONS: ParserOptions = {
   plugins: ['typescript', 'classProperties', 'dynamicImport', 'jsx', 'decorators-legacy', 'exportDefaultFrom']
 }
 
-export function resolveImportModulePath(sourcePath: string, importModulePath: string) {
+export function resolveImportModulePath(sourcePath: string, importModulePath: string): string | null {
   const config = getTsJsConfig()
 
   if (!config || !config.compilerOptions || !config.compilerOptions.paths) {

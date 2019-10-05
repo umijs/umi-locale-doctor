@@ -126,10 +126,26 @@ describe('locale files', () => {
           {
             key: 'name',
             loc: {
-              startLine: 5,
+              startLine: 9,
               startLineColumn: 2,
-              endLine: 5,
+              endLine: 9,
               endLineColumn: 6
+            },
+            filePath: global.toFixturesDir(
+              'localesParser',
+              'only_valid_locales_references',
+              'src',
+              'locales',
+              'zh-CN.ts'
+            )
+          },
+          {
+            key: 'bar-1',
+            loc: {
+              startLine: 4,
+              startLineColumn: 2,
+              endLine: 4,
+              endLineColumn: 9
             },
             filePath: global.toFixturesDir(
               'localesParser',
