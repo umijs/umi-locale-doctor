@@ -1,4 +1,7 @@
+const title = 'Title'
+
 export default {
   name: 'Name',
-  age: 'Age'
+  'error-signout': 'Error Signout',
+  title
 }

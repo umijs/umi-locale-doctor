@@ -1,6 +1,6 @@
-import menu from './zh-CN/menu'
+import menus from './zh_menus/menus'
 
 export default {
-  ...menu,
+  ...menus,
   name: '名字'
 }

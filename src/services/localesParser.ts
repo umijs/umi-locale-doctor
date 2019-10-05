@@ -45,24 +45,20 @@ export class LocalParser extends EventEmitter implements ILocaleParser {
 
     const localeFiles = flatten<string>(localeFilepaths)
 
-    const localeKeys = await Promise.all(
-      localeFiles.map(async l => {
+    const locales = await Promise.all(
+      localeFiles.map<Promise<ILocale>>(async l => {
         const data = await parseFileToLocale(l)
 
         this.emit(PARSE_EVENTS.PARSED, l)
 
-        return data
+        return {
+          lang: langFromPath(l),
+          localeKeys: data
+        }
       })
     )
 
-    return localeKeys
-      .filter((l): l is ILocaleKey[] => !!l)
-      .map<ILocale>(d => {
-        return {
-          lang: langFromPath(d[0].filePath),
-          localeKeys: d
-        }
-      })
+    return locales.filter((l): l is ILocale => !!l.localeKeys)
   }
 }
 

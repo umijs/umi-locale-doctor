@@ -27,20 +27,30 @@ describe('locale files', () => {
           {
             key: 'name',
             loc: {
-              startLine: 2,
+              startLine: 4,
               startLineColumn: 2,
-              endLine: 2,
+              endLine: 4,
               endLineColumn: 6
             },
             filePath: global.toFixturesDir('localesParser', 'only_valid_locales', 'src', 'locales', 'en-US.ts')
           },
           {
-            key: 'age',
+            key: 'error-signout',
             loc: {
-              startLine: 3,
+              startLine: 5,
               startLineColumn: 2,
-              endLine: 3,
-              endLineColumn: 5
+              endLine: 5,
+              endLineColumn: 17
+            },
+            filePath: global.toFixturesDir('localesParser', 'only_valid_locales', 'src', 'locales', 'en-US.ts')
+          },
+          {
+            key: 'title',
+            loc: {
+              startLine: 6,
+              startLineColumn: 2,
+              endLine: 6,
+              endLineColumn: 7
             },
             filePath: global.toFixturesDir('localesParser', 'only_valid_locales', 'src', 'locales', 'en-US.ts')
           }
@@ -52,20 +62,30 @@ describe('locale files', () => {
           {
             key: 'name',
             loc: {
-              startLine: 2,
+              startLine: 4,
               startLineColumn: 2,
-              endLine: 2,
+              endLine: 4,
               endLineColumn: 6
             },
             filePath: global.toFixturesDir('localesParser', 'only_valid_locales', 'src', 'locales', 'zh-CN.ts')
           },
           {
-            key: 'age',
+            key: 'error-signout',
             loc: {
-              startLine: 3,
+              startLine: 5,
               startLineColumn: 2,
-              endLine: 3,
-              endLineColumn: 5
+              endLine: 5,
+              endLineColumn: 17
+            },
+            filePath: global.toFixturesDir('localesParser', 'only_valid_locales', 'src', 'locales', 'zh-CN.ts')
+          },
+          {
+            key: 'title',
+            loc: {
+              startLine: 6,
+              startLineColumn: 2,
+              endLine: 6,
+              endLineColumn: 7
             },
             filePath: global.toFixturesDir('localesParser', 'only_valid_locales', 'src', 'locales', 'zh-CN.ts')
           }
@@ -74,15 +94,13 @@ describe('locale files', () => {
     ])
   })
 
-  it('only valid locales with references, default export', async () => {
+  it('only valid locales with spread references', async () => {
     const runDir = global.toFixturesDir('localesParser', 'only_valid_locales_references')
     process.chdir(runDir)
 
     const parser = Container.get(ILocaleParserToken)
 
     const locales = await parser.parse()
-
-    console.log('locales', locales)
 
     expect(locales).toEqual([
       {
@@ -101,8 +119,8 @@ describe('locale files', () => {
               'only_valid_locales_references',
               'src',
               'locales',
-              'zh-CN',
-              'menu.ts'
+              'zh_menus',
+              'menus.ts'
             )
           },
           {
