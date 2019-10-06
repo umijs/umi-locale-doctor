@@ -1,13 +1,13 @@
 import chalk from 'chalk'
 import { table } from 'table'
-import { IUnUsedWarning, IUndefinedWarning, IKey } from '@/src/types'
+import { IUnUsedWarning, IUndefinedWarning } from '@/src/types'
 
 export default class ResultPrinter {
   public printNeverUsedKeys(neverUsedKeys: IUnUsedWarning[]) {
     const data = []
 
     console.log('')
-    console.log('  ' + chalk.yellow.bold.bold('Keys defined but never used'))
+    console.log('  ' + chalk.yellow.bold('Keys defined but never used'))
 
     data.push([chalk.bold('Key'), chalk.bold('Location')])
 
@@ -29,7 +29,7 @@ export default class ResultPrinter {
     const data = []
 
     console.log('')
-    console.log('  ' + chalk.yellow.bold.bold('Keys used but never defined'))
+    console.log('  ' + chalk.yellow.bold('Keys used but never defined'))
 
     data.push([chalk.bold('Key'), chalk.bold('Langs'), chalk.bold('Location')])
 
