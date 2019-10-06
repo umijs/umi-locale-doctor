@@ -17,11 +17,9 @@ import {
   isImportDeclaration,
   isImportDefaultSpecifier,
   ObjectProperty,
-  isDeclareVariable,
   isVariableDeclaration,
   isVariableDeclarator,
-  ObjectExpression,
-  File
+  ObjectExpression
 } from '@babel/types'
 
 import { IResourceMatcherToken, IResourceMatcher } from '@/src/services/resourceMatcher'

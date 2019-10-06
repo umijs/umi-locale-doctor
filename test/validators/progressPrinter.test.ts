@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 import { PARSE_EVENTS } from '@/src/types/events'
 
-describe('ProgressPinter', () => {
+describe('ProgressPrinter', () => {
   it('normal case', done => {
     const mockStart = jest.fn(function() {
       return this
@@ -11,7 +11,6 @@ describe('ProgressPinter', () => {
     const texts: string[] = []
 
     const mockOra = jest.fn(() => {
-      console.log('sdfdsfdsfs')
       return {
         start: mockStart,
         set text(text: string) {
