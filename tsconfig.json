@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
+    "importHelpers": true,
     "sourceMap": true,
     "baseUrl": ".",
     "allowSyntheticDefaultImports": true,
