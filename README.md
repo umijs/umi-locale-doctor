@@ -19,6 +19,8 @@ See below:
 
 ## Install
 
+> not published yet
+
 ```bash
 yarn global add umi-locale-doctor
 ```

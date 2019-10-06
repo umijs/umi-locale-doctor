@@ -47,7 +47,6 @@
     "glob": "^7.1.4",
     "mz": "^2.7.0",
     "ora": "^4.0.2",
-    "reflect-metadata": "^0.1.13",
     "table": "^5.4.6",
     "tsconfig-paths": "^3.9.0",
     "typedi": "^0.8.0"

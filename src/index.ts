@@ -1,4 +1,3 @@
-import 'reflect-metadata'
 import commander from 'commander'
 import packageJson from '@/package.json'
 
