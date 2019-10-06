@@ -25,8 +25,10 @@ export function resolveImportModulePath(sourcePath: string, importModulePath: st
   )
 
   const matched = matchPath(importModulePath, undefined, undefined, ['.js', '.ts'])
-
-  return tryPaths(matched)
+  if (matched) {
+    return tryPaths(matched)
+  }
+  return tryResolveRelativeFilePath(sourcePath, importModulePath)
 }
 
 export function tryPaths(filePath: string) {

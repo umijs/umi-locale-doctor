@@ -146,13 +146,7 @@ describe('path resolve', () => {
       const sourcePath = global.toFixturesDir('pathResolve', 'valid_relative_paths_config', 'home.ts')
       const matched = resolveImportModulePath(sourcePath, '@/a/b')
 
-      const realPath = global.toFixturesDir(
-        'pathResolve',
-        'valid_relative_paths_config',
-        'a',
-        'b',
-        'index.ts'
-      )
+      const realPath = global.toFixturesDir('pathResolve', 'valid_relative_paths_config', 'a', 'b', 'index.ts')
 
       expect(matched).toBe(realPath)
     })
@@ -164,13 +158,19 @@ describe('path resolve', () => {
       const sourcePath = global.toFixturesDir('pathResolve', 'valid_relative_paths_config_nobase', 'home.ts')
       const matched = resolveImportModulePath(sourcePath, '@/a/b')
 
-      const realPath = global.toFixturesDir(
-        'pathResolve',
-        'valid_relative_paths_config_nobase',
-        'a',
-        'b',
-        'index.ts'
-      )
+      const realPath = global.toFixturesDir('pathResolve', 'valid_relative_paths_config_nobase', 'a', 'b', 'index.ts')
+
+      expect(matched).toBe(realPath)
+    })
+
+    it('valid relative paths with config', () => {
+      const runDir = global.toFixturesDir('pathResolve', 'valid_relative_paths_config')
+      process.chdir(runDir)
+
+      const sourcePath = global.toFixturesDir('pathResolve', 'valid_relative_paths_config', 'home.ts')
+      const matched = resolveImportModulePath(sourcePath, './a/b')
+
+      const realPath = global.toFixturesDir('pathResolve', 'valid_relative_paths_config', 'a', 'b', 'index.ts')
 
       expect(matched).toBe(realPath)
     })
