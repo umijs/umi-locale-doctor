@@ -2,6 +2,9 @@ import EventEmitter from 'events'
 import { PARSE_EVENTS } from '@/src/types/events'
 
 describe('ProgressPrinter', () => {
+  afterEach(() => {
+    jest.resetModules()
+  })
   it('normal case', done => {
     const mockStart = jest.fn(function() {
       return this
@@ -48,6 +51,46 @@ describe('ProgressPrinter', () => {
         'Parsing testType 50.0% => src/locales/zh-CN.ts',
         'Parsing testType 100.0% => src/locales/en-US.ts'
       ])
+
+      done()
+    }, 500)
+  })
+
+  it('no matched case', done => {
+    const mockStart = jest.fn(function() {
+      return this
+    })
+    const mockSucceed = jest.fn()
+
+    const texts: string[] = []
+
+    const mockOra = jest.fn(() => {
+      return {
+        start: mockStart,
+        set text(text: string) {
+          texts.push(text)
+        },
+        succeed: mockSucceed
+      }
+    })
+
+    jest.mock('ora', () => {
+      return jest.fn().mockImplementation(mockOra)
+    })
+
+    const { default: ProgressPrinter } = require('@/src/validators/progressPrinter')
+    const emitter = new EventEmitter()
+    new ProgressPrinter(emitter, 'testType').start()
+
+    setTimeout(() => {
+      emitter.emit(PARSE_EVENTS.START, [])
+    }, 10)
+
+    setTimeout(() => {
+      expect(mockOra).toBeCalledWith('Parsing testType 0%')
+      expect(mockStart).toBeCalled()
+      expect(mockSucceed).toBeCalled()
+      expect(texts).toEqual([])
 
       done()
     }, 500)

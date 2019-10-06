@@ -65,22 +65,26 @@ export class LocalParser extends EventEmitter implements ILocaleParser {
 }
 
 async function parseFileToLocaleKeys(filePath: string): Promise<ILocaleKey[]> | null {
-  const code = await fs.readFile(filePath, { encoding: 'utf-8' })
-  const ast = parse(code, BABEL_PARSER_OPTIONS)
+  try {
+    const code = await fs.readFile(filePath, { encoding: 'utf-8' })
+    const ast = parse(code, BABEL_PARSER_OPTIONS)
 
-  const { body: astbody } = ast.program
+    const { body: astbody } = ast.program
 
-  const exportDefaultDeclaration = astbody.find((n): n is ExportDefaultDeclaration => isExportDefaultDeclaration(n))
+    const exportDefaultDeclaration = astbody.find((n): n is ExportDefaultDeclaration => isExportDefaultDeclaration(n))
 
-  if (!exportDefaultDeclaration) {
-    return null
-  }
+    if (!exportDefaultDeclaration) {
+      return null
+    }
 
-  const defaultDeclaration = exportDefaultDeclaration.declaration
-  const localeAst = isTSAsExpression(defaultDeclaration) ? defaultDeclaration.expression : defaultDeclaration
+    const defaultDeclaration = exportDefaultDeclaration.declaration
+    const localeAst = isTSAsExpression(defaultDeclaration) ? defaultDeclaration.expression : defaultDeclaration
 
-  if (isObjectExpression(localeAst)) {
-    return parserFromObjectExpression(localeAst, filePath, astbody)
+    if (isObjectExpression(localeAst)) {
+      return parserFromObjectExpression(localeAst, filePath, astbody)
+    }
+  } catch (error) {
+    // ignore
   }
 
   return null

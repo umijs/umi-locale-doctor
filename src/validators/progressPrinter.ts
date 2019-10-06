@@ -21,6 +21,9 @@ export default class ProgressPrinter {
     this.emitter.on(PARSE_EVENTS.START, (files: string[]) => {
       this.spinner = ora(`Parsing ${this.type} 0%`).start()
       this.spinnerTotal = files.length
+      if (!files.length) {
+        this.spinner.succeed()
+      }
     })
 
     this.emitter.on(PARSE_EVENTS.PARSED, (file: string) => {

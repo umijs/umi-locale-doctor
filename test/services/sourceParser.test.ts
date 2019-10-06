@@ -73,6 +73,11 @@ describe('source files', () => {
 
     const sources = await parser.parse()
 
-    expect(sources).toEqual([])
+    expect(sources).toEqual([
+      {
+        filePath: global.toFixturesDir('sourcesParser', 'invalid_sources', 'src', 'pages', 'home.ts'),
+        keys: []
+      }
+    ])
   })
 })

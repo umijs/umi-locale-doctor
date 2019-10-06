@@ -37,8 +37,7 @@ export class SourceParser extends EventEmitter implements ISourceParser {
 
     this.emit(PARSE_EVENTS.START, sourceFiles)
 
-    const sources: ISource[] = await this.parseRest(sourceFiles)
-    return sources.filter(s => s.keys.length)
+    return await this.parseRest(sourceFiles)
   }
 
   private async parseRest(filePaths: string[]): Promise<ISource[]> {
@@ -46,56 +45,60 @@ export class SourceParser extends EventEmitter implements ISourceParser {
       return []
     }
     const filePath = filePaths[0]
-    const code = await fs.readFile(filePath, { encoding: 'utf-8' })
-
-    const ast = parse(code, BABEL_PARSER_OPTIONS)
 
     const source: ISource = {
       filePath,
       keys: []
     }
 
-    traverse(ast, {
-      JSXOpeningElement(path) {
-        if (
-          isJSXIdentifier(path.node.name, { name: 'FormattedMessage' }) ||
-          isJSXIdentifier(path.node.name, { name: 'FormattedHTMLMessage' })
-        ) {
-          const attr = path.node.attributes
-            .filter((a): a is JSXAttribute => isJSXAttribute(a))
-            .find(a => a.name.name === 'id')
-          if (attr && isStringLiteral(attr.value)) {
-            source.keys.push({
-              key: attr.value.value,
-              loc: toILoc(attr.value.loc)
-            })
-          }
-        }
-      },
+    try {
+      const code = await fs.readFile(filePath, { encoding: 'utf-8' })
 
-      CallExpression(path) {
-        if (
-          isIdentifier(path.node.callee, { name: 'formatMessage' }) ||
-          isIdentifier(path.node.callee, { name: 'formatHTMLMessage' })
-        ) {
-          if (path.node.arguments && isObjectExpression(path.node.arguments[0])) {
-            const arg = path.node.arguments[0]
-            const property = arg.properties
-              .filter((p): p is ObjectProperty => isObjectProperty(p))
-              .find(p => isIdentifier(p.key) && p.key.name === 'id')
-            if (property) {
-              if (isStringLiteral(property.value)) {
-                source.keys.push({
-                  key: property.value.value,
-                  loc: toILoc(property.value.loc)
-                })
+      const ast = parse(code, BABEL_PARSER_OPTIONS)
+
+      traverse(ast, {
+        JSXOpeningElement(path) {
+          if (
+            isJSXIdentifier(path.node.name, { name: 'FormattedMessage' }) ||
+            isJSXIdentifier(path.node.name, { name: 'FormattedHTMLMessage' })
+          ) {
+            const attr = path.node.attributes
+              .filter((a): a is JSXAttribute => isJSXAttribute(a))
+              .find(a => a.name.name === 'id')
+            if (attr && isStringLiteral(attr.value)) {
+              source.keys.push({
+                key: attr.value.value,
+                loc: toILoc(attr.value.loc)
+              })
+            }
+          }
+        },
+
+        CallExpression(path) {
+          if (
+            isIdentifier(path.node.callee, { name: 'formatMessage' }) ||
+            isIdentifier(path.node.callee, { name: 'formatHTMLMessage' })
+          ) {
+            if (path.node.arguments && isObjectExpression(path.node.arguments[0])) {
+              const arg = path.node.arguments[0]
+              const property = arg.properties
+                .filter((p): p is ObjectProperty => isObjectProperty(p))
+                .find(p => isIdentifier(p.key) && p.key.name === 'id')
+              if (property) {
+                if (isStringLiteral(property.value)) {
+                  source.keys.push({
+                    key: property.value.value,
+                    loc: toILoc(property.value.loc)
+                  })
+                }
               }
             }
           }
         }
-      }
-    })
-
+      })
+    } catch (error) {
+      // ignore
+    }
     this.emit(PARSE_EVENTS.PARSED, filePath)
 
     return [source].concat(await this.parseRest(filePaths.slice(1)))
