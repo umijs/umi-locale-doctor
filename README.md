@@ -8,7 +8,7 @@
 [![code style: prettier][prettier-image]][prettier-url]
 ![][license-url]
 
-A useful tool to analyze [umi-locale-usage](https://umijs.org/api/#locale):
+A useful tool to analyze [umi locale usage](https://umijs.org/api/#locale):
 
 - keys are miss defined in locales
 - keys are never used in source code
