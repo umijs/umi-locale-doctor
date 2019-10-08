@@ -44,7 +44,7 @@ see [contributing](https://github.com/umijs/umi-locale-doctor/blob/master/CONTRI
 [npm-url]: https://npmjs.org/package/umi-locale-doctor
 [npm-image]: https://badge.fury.io/js/umi-locale-doctor.png
 [david-url]: https://david-dm.org/umijs/umi-locale-doctor.png
-[travis-image]: https://api.travis-ci.com/umijs/umi-locale-doctor.svg?branch=master
+[travis-image]: https://www.travis-ci.org/umijs/umi-locale-doctor.svg?branch=master
 [travis-url]: https://travis-ci.com/umijs/umi-locale-doctor
 [coverage-image]: https://coveralls.io/repos/github/umijs/umi-locale-doctor/badge.svg?branch=master
 [coverage-url]: https://coveralls.io/github/umijs/umi-locale-doctor
