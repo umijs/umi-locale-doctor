@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/leftstick/umi-locale-doctor.git"
+    "url": "git+https://github.com/umijs/umi-locale-doctor.git"
   },
   "keywords": [
     "doctor",
@@ -35,9 +35,9 @@
   "author": "Howard.Zuo",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/leftstick/umi-locale-doctor/issues"
+    "url": "https://github.com/umijs/umi-locale-doctor/issues"
   },
-  "homepage": "https://github.com/leftstick/umi-locale-doctor#readme",
+  "homepage": "https://github.com/umijs/umi-locale-doctor#readme",
   "dependencies": {
     "@babel/parser": "^7.6.2",
     "@babel/traverse": "^7.6.2",
