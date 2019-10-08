@@ -19,7 +19,8 @@
   "scripts": {
     "test": "jest",
     "coverage": "cat ./coverage/lcov.info | coveralls",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "prepublish": "rm -rf ./bin && yarn build"
   },
   "repository": {
     "type": "git",
