@@ -1,6 +1,6 @@
 {
   "name": "umi-locale-doctor",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A doctor checks which keys are miss defined in locales, and which keys are never used in source code",
   "main": "./bin/index.js",
   "bin": {
